@@ -29,6 +29,25 @@ X = filtered_melbourne_data[melbourne_features]
 # run the script
 train_X, val_X, train_y, val_y = train_test_split(X, y, random_state=0)
 
-for max_leaf_nodes in [5, 50, 500, 5000]:
+# Store the best size of tree nodes
+candidate_max_leaf_nodes = [5, 50, 500, 5000]
+tree_size_eval = {}
+for max_leaf_nodes in candidate_max_leaf_nodes:
     my_mae = get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y)
+    tree_size_eval[max_leaf_nodes] = my_mae
     print("Max leaf nodes: %d \t\t Mean Absolute Error: %d" %(max_leaf_nodes, my_mae))
+
+best_tree_size = min(tree_size_eval, key=tree_size_eval.get)
+print(best_tree_size)
+
+# Define model
+final_model = DecisionTreeRegressor(max_leaf_nodes=best_tree_size, random_state=0)
+
+# Fit model
+final_model.fit(X, y)
+
+# Predict model
+val_predications = final_model.predict(X)
+
+print(y[0:5])
+print(val_predications[0:5])
